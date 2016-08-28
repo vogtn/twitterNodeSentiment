@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/vogtn/twitterNodeSentiment/issues"
   },
-  "homepage": "https://github.com/vogtn/twitterNodeSentiment"
+  "homepage": "https://github.com/vogtn/twitterNodeSentiment",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }
