@@ -13,7 +13,7 @@ var tweeter = new twitter({
 
 app.get('/twitterCheck', function(req,res){
   tweeter.verifyCredentials(function(error,data){
-    res.send("Hello, " + data.name + ". I am in your twitters");
+    res.send("Hello, " + data.name + ". I am in your twitters.");
   });
 });
 
