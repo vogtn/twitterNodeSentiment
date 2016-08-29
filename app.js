@@ -13,13 +13,25 @@ var T = new Twit({
   timeout_ms: 60*1000,
 });
 
+//Search Twitter for "banana"
 app.get('/twitterCheck', function(req,res){
   T.get('search/tweets', { q: 'banana since:2011-07-11', count: 100 }, function(err, data, response) {
     res.send(data)
   })
 });
 
+//Verify Credentials
+app.get('/verifyCredentials', function (req, res) {
+  T.get('account/verify_credentials', { skip_status: true })
+    .catch(function (err) {
+      console.log('caught error', err.stack)
+    })
+    .then(function (result) {
+      res.send('data', result.data);
+    })
+});
 
+//Express form
 app.get('/',
     function (req, res) {
         var response = "<HEAD>" +
