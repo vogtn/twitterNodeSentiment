@@ -14,12 +14,8 @@ var T = new Twit({
 });
 
 app.get('/twitterCheck', function(req,res){
-  T.get('account/verify_credentials', { skip_status: true })
-  .catch(function (err) {
-    console.log('caught error', err.stack)
-  })
-  .then(function (result) {
-    res.send(result.data);
+  T.get('search/tweets', { q: 'banana since:2011-07-11', count: 100 }, function(err, data, response) {
+    res.send(data)
   })
 });
 
