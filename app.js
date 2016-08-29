@@ -3,17 +3,24 @@ var express = require('express');
 
 var app = express();
 var util = require('util');
-var twitter = require("twitter");
+var Twit = require("twit");
 
-var tweeter = new twitter({
-  consumer_key: '	odiVW1DzbLhd1f8ty2ihpkJw9',
-  consumer_secret: 'u4wYd5lTpMwjoaDCVNMY0d4cwUwntqsnoGwMEFuzfJ9jqjhhuU',
-  access_token_key: '	717354259910496260-njBGpX5W9o5gb6seNsPh3ZV6ztWAmOW',
-  access_token_secret: 'Mw3p4ovQS4XeG2hxKiBARCR9IdcwU9xOZBmBlQtEp16uO'
+var T = new Twit({
+  consumer_key: 'xQTtvg7Rz63uqPReu9vrLuPus',
+  consumer_secret: 'XFEFLjfRHO0mr4x9imRbtU3JrRJeBupqHC78PnyCg3llzT6iMc',
+  access_token: '717354259910496260-njBGpX5W9o5gb6seNsPh3ZV6ztWAmOW',
+  access_token_secret: 'Mw3p4ovQS4XeG2hxKiBARCR9IdcwU9xOZBmBlQtEp16uO',
+  timeout_ms: 60*1000,
 });
 
-app.get('/twitterCheck', function (req, res) {
-        res.send("Hello, " + data.name + ".  I am in your twitters.");
+app.get('/twitterCheck', function(req,res){
+  T.get('account/verify_credentials', { skip_status: true })
+  .catch(function (err) {
+    console.log('caught error', err.stack)
+  })
+  .then(function (result) {
+    res.send(result.data);
+  })
 });
 
 
