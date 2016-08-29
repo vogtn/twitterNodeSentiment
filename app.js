@@ -39,7 +39,6 @@ function resetMonitoring(){
 }
 
 function beginMonitoring(phrase) {
-    var stream;
     // cleanup if we're re-setting the monitoring
     if (monitoringPhrase) {
         resetMonitoring();
@@ -58,12 +57,12 @@ function beginMonitoring(phrase) {
               console.log("Monitoring Twitter for " + monitoringPhrase);
               stream.on('data', function (data) {
                   // only evaluate the sentiment of English-language tweets
-                  if (data.lang === 'en') {
+                  //if (data.lang === 'en') {
                       sentiment(data.text, function (err, result) {
                           tweetCount++;
                           tweetTotalSentiment += result.score;
                       });
-                  }
+                  //}
               });
           });
           return stream;
@@ -148,11 +147,17 @@ app.get('/',
         }
     });
 
+    
+//Action views
 
     app.get('/monitor', function (req, res) {
         beginMonitoring(req.query.phrase);
         res.redirect(302, '/');
     });
+    app.get('/reset', function (req, res) {
+    resetMonitoring();
+    res.redirect(302, '/');
+});
 
 app.listen(port);
 console.log("Server listening on port" + port);
