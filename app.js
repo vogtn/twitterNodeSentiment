@@ -2,7 +2,7 @@ var port = 3000;
 var express = require('express');
 
 var app = express();
-var twitter = require("ntwitter");
+var twitter = require("twitter");
 
 var tweeter = new twitter({
   consumer_key: '	odiVW1DzbLhd1f8ty2ihpkJw9',

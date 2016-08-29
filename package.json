@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/vogtn/twitterNodeSentiment",
   "dependencies": {
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "twitter": "^1.4.0"
   }
 }
