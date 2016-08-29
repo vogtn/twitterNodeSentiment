@@ -30,6 +30,11 @@ var T = new Twit({
 });
 
 function resetMonitoring(){
+  if (stream) {
+  var tempStream = stream;
+    stream = null;  // signal to event handlers to ignore end/destroy
+  tempStream.destroySilent();
+}
   monitoringPhrase = "";
 }
 
