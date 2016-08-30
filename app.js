@@ -142,19 +142,20 @@ app.get('/stream', function(req,res){
   })
 });
 
-//Stream sentiment example
+//Stream sentiment Nic v
 app.get('/streamsentiment', function(req,res){
   var tweetScore = 0;
   var tweetNum = 0;
-  var stream = T.stream('statuses/filter', {track: 'mango'})
+  var sentimentScore = 0;
+  var stream = T.stream('statuses/filter', {track: 'jesus'})
   stream.on('tweet', function(tweet){
     if (tweet.lang === 'en') {
         sentiment(tweet.text, function (err, result) {
           tweetScore += result.score;
           tweetNum++;
-          var sentimentScore = tweetScore/tweetNum;
+          sentimentScore = tweetScore/tweetNum;
+          console.log(sentimentScore);
         });
-        res.sendStatus(sentimentScore);
     }
   })
 })
