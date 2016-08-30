@@ -31,9 +31,7 @@ var T = new Twit({
 
 function resetMonitoring(){
   if (stream) {
-  var tempStream = stream;
     stream = null;  // signal to event handlers to ignore end/destroy
-  tempStream.destroySilent();
 }
   monitoringPhrase = "";
 }
@@ -51,18 +49,19 @@ function beginMonitoring(phrase) {
           console.log('caught error', err.stack)
         })
         .then(function (result) {
+        */
           stream = T.stream('statuses/filter', {
               'track': monitoringPhrase
           }, function (stream) {
               console.log("Monitoring Twitter for " + monitoringPhrase);
               stream.on('data', function (data) {
-                  // only evaluate the sentiment of English-language tweets
-                  //if (data.lang === 'en') {
+                  only evaluate the sentiment of English-language tweets
+                  if (data.lang === 'en') {
                       sentiment(data.text, function (err, result) {
                           tweetCount++;
                           tweetTotalSentiment += result.score;
                       });
-                  //}
+                  }
               });
           });
           return stream;
@@ -147,7 +146,7 @@ app.get('/',
         }
     });
 
-    
+
 //Action views
 
     app.get('/monitor', function (req, res) {
