@@ -12,14 +12,6 @@ var tweetCount = 0;
 var tweetTotalSentiment = 0;
 var monitoringPhrase;
 
-app.get('/sentiment', function (req, res) {
-    res.json({monitoring: (monitoringPhrase != null),
-    	monitoringPhrase: monitoringPhrase,
-    	tweetCount: tweetCount,
-    	tweetTotalSentiment: tweetTotalSentiment,
-    	sentimentImageURL: sentimentImage()});
-});
-
 
 var T = new Twit({
   consumer_key: 'xQTtvg7Rz63uqPReu9vrLuPus',
@@ -29,9 +21,34 @@ var T = new Twit({
   timeout_ms: 60*1000,
 });
 
+
+app.get('/sentiment', function (req, res) {
+    res.json({monitoring: (monitoringPhrase != null),
+    	monitoringPhrase: monitoringPhrase,
+    	tweetCount: tweetCount,
+    	tweetTotalSentiment: tweetTotalSentiment,
+    	sentimentImageURL: sentimentImage()});
+});
+
+app.post('/sentiment', function (req, res) {
+	try {
+		if (req.body.phrase) {
+	    	beginMonitoring(req.body.phrase);
+			res.send(200);
+		} else {
+			res.status(400).send('Invalid request: send {"phrase": "bieber"}');
+		}
+	} catch (exception) {
+		res.status(400).send('Invalid request: send {"phrase": "bieber"}');
+	}
+});
+
+
 function resetMonitoring(){
   if (stream) {
+    var tempStream = stream;
     stream = null;  // signal to event handlers to ignore end/destroy
+    tempStream.destroySilent();
 }
   monitoringPhrase = "";
 }
@@ -48,14 +65,14 @@ function beginMonitoring(phrase) {
         .catch(function (err) {
           console.log('caught error', err.stack)
         })
-        .then(function (result) {
-        */
-          stream = T.stream('statuses/filter', {
-              'track': monitoringPhrase
-          }, function (stream) {
+        .then(function (stream) {
+           T.stream('statuses/filter', {
+              track : monitoringPhrase
+          }, function (inStream) {
+            stream = inStream;
               console.log("Monitoring Twitter for " + monitoringPhrase);
               stream.on('data', function (data) {
-                  only evaluate the sentiment of English-language tweets
+                  //only evaluate the sentiment of English-language tweets
                   if (data.lang === 'en') {
                       sentiment(data.text, function (err, result) {
                           tweetCount++;
@@ -63,6 +80,25 @@ function beginMonitoring(phrase) {
                       });
                   }
               });
+              stream.on('error', function (error, code) {
+                  console.error("Error received from tweet stream: " + code);
+                    if (code === 420)  {
+                      console.error("API limit hit, are you using your own keys?");
+                    }
+                    resetMonitoring();
+                  });
+                  stream.on('end', function (response) {
+                    if (stream) { // if we're not in the middle of a reset already
+                    // Handle a disconnection
+                    console.error("Stream ended unexpectedly, resetting monitoring.");
+                    resetMonitoring();
+                  }
+                });
+                stream.on('destroy', function (response) {
+                  // Handle a 'silent' disconnection from Twitter, no end/error event fired
+                  console.error("Stream destroyed unexpectedly, resetting monitoring.");
+                  resetMonitoring();
+                });
           });
           return stream;
         })
@@ -83,7 +119,7 @@ function sentimentImage() {
 //Search Twitter for "banana"
 app.get('/twitterCheck', function(req,res){
   T.get('search/tweets', { q: 'banana since:2011-07-11', count: 100 }, function(err, data, response) {
-    res.send(data)
+    res.send(data.user)
   })
 });
 
@@ -123,7 +159,6 @@ app.get('/',
         "<INPUT type=\"text\" name=\"phrase\"><br><br>\n" +
         "<INPUT type=\"submit\" value=\"Go\">\n" +
         "</P>\n" + "</FORM>\n" + "</BODY>";
-        var phrase = req.query.phrase;
         if (!monitoringPhrase) {
             res.send(welcomeResponse);
         } else {
@@ -156,6 +191,23 @@ app.get('/',
     app.get('/reset', function (req, res) {
     resetMonitoring();
     res.redirect(302, '/');
+});
+
+app.get('/watchTwitter', function (req, res) {
+    var stream;
+    var testTweetCount = 0;
+    var phrase = 'bieber';
+    // var phrase = 'ice cream';
+    stream = T.stream('statuses/filter', {track: phrase}, function (stream) {
+            res.send("Monitoring Twitter for \'" + phrase + "\'...  Logging Twitter traffic.");
+            stream.on('data', function (data) {
+                testTweetCount++;
+                // Update the console every 50 analyzed tweets
+                if (testTweetCount % 50 === 0) {
+                    console.log("Tweet #" + testTweetCount + ":  " + data.text);
+                }
+            });
+        });
 });
 
 app.listen(port);
