@@ -65,16 +65,16 @@ function beginMonitoring(phrase) {
         .catch(function (err) {
           console.log('caught error', err.stack)
         })
-        .then(function (stream) {
+        .then(function (result) {
            T.stream('statuses/filter', {
               track : monitoringPhrase
           }, function (inStream) {
             stream = inStream;
               console.log("Monitoring Twitter for " + monitoringPhrase);
-              stream.on('data', function (data) {
+              stream.on('tweet', function (tweet) {
                   //only evaluate the sentiment of English-language tweets
-                  if (data.lang === 'en') {
-                      sentiment(data.text, function (err, result) {
+                  if (tweet.lang === 'en') {
+                      sentiment(tweet.text, function (err, result) {
                           tweetCount++;
                           tweetTotalSentiment += result.score;
                       });
@@ -119,7 +119,7 @@ function sentimentImage() {
 //Search Twitter for "banana"
 app.get('/twitterCheck', function(req,res){
   T.get('search/tweets', { q: 'banana since:2011-07-11', count: 100 }, function(err, data, response) {
-    res.send(data.user)
+    res.send(data);
   })
 });
 
@@ -138,9 +138,26 @@ app.get('/verifyCredentials', function (req, res) {
 app.get('/stream', function(req,res){
   var stream = T.stream('statuses/filter', { track: 'mango' })
   stream.on('tweet', function (tweet) {
-    res.send(tweet);
+    console.log(tweet.text);
   })
 });
+
+//Stream sentiment example
+app.get('/streamsentiment', function(req,res){
+  var tweetScore = 0;
+  var tweetNum = 0;
+  var stream = T.stream('statuses/filter', {track: 'mango'})
+  stream.on('tweet', function(tweet){
+    if (tweet.lang === 'en') {
+        sentiment(tweet.text, function (err, result) {
+          tweetScore += result.score;
+          tweetNum++;
+          var sentimentScore = tweetScore/tweetNum;
+        });
+        res.sendStatus(sentimentScore);
+    }
+  })
+})
 
 
 //Express form
