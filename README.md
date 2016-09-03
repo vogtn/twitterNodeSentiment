@@ -47,5 +47,4 @@ app.get('/streamsentiment', function(req,res){
   })
 })
 ```
-
-![Alt text](/screenshot/sentiment.png "Console Log for keyword "jesus"")
+![ScreenShot](https://raw.github.com/vogtn/twitterNodeSentiment/screenshot/sentiment.png)
