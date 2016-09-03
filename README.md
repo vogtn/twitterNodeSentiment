@@ -47,4 +47,4 @@ app.get('/streamsentiment', function(req,res){
   })
 })
 ```
-![ScreenShot](https://raw.github.com/vogtn/twitterNodeSentiment/screenshot/sentiment.png)
+![ScreenShot](https://cloud.githubusercontent.com/assets/11411686/18228071/6c07f4c0-71f0-11e6-8e75-655863aa9b53.png)
