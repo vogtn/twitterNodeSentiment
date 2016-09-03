@@ -27,3 +27,25 @@ Much of the code in this file relies on Scott Rich's tutorial, however, ntwitter
 I wanted this project to help teach me the twitter api ecosystem, while also providing a realistic project towards my nodejs learning. 
 Currently it is still a work in progress, as of now, I am able to create a stream, and use the sentiment module to anaylze phrases. It is then logged 
 console, but soon I hope to learn more front end UI (react?) to bring together the application and recieve user input. 
+
+This function will produce sentiment analysis for keyword "jesus":
+```javascript
+app.get('/streamsentiment', function(req,res){
+  var tweetScore = 0;
+  var tweetNum = 0;
+  var sentimentScore = 0;
+  var stream = T.stream('statuses/filter', {track: 'jesus'})
+  stream.on('tweet', function(tweet){
+    if (tweet.lang === 'en') {
+        sentiment(tweet.text, function (err, result) {
+          tweetScore += result.score;
+          tweetNum++;
+          sentimentScore = tweetScore/tweetNum;
+          console.log(sentimentScore);
+        });
+    }
+  })
+})
+```
+
+![Alt text](/screenshot/sentiment.png "Console Log for keyword "jesus"")
